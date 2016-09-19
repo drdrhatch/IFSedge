@@ -74,7 +74,10 @@ def my_corr_func_complex(v1,v2,time,show_plot=False,v1eqv2=True):
 par = Parameters()
 par.Read_Pars('parameters')
 pars = par.pardict
-edge_opt = pars['edge_opt']
+if 'edge_opt' in pars:
+    edge_opt = pars['edge_opt']
+else:
+    edge_opt = 1
 print "edge_opt = ",edge_opt
 if pars['n_spec'] == 3:
    print "Species 3:",pars['name3']   
@@ -108,8 +111,10 @@ if 'x_local' in pars and not pars['x_local']:
             scan_info[i,0] = pars0['kymin']
             if 'x0' in pars0:
                 scan_info[i,1] = pars0['x0']
-            else:
+            elif 'x0' in pars:
                 scan_info[i,1] = pars['x0']
+            else:
+                scan_info[i,1] = np.nan
             scan_info[i,2] = 0.0
             if 'n0_global' in pars0:
                 scan_info[i,3] = pars0['n0_global']
@@ -148,14 +153,16 @@ if 'x_local' in pars and not pars['x_local']:
             scan_info[i,4]=np.nan
             scan_info[i,5]=np.nan
         if os.path.isfile('field_'+scan_num):
-            field = fieldfile('field_'+scan_num,pars0)
-            field.set_time(field.tfld[-1])
+            field = fieldfile('field_'+scan_num,pars0,False)
+            #field.set_time(field.tfld[-1])
+            field.set_time(field.tfld[-1],len(field.tfld)-1)
             fntot = field.nz*field.nx
     
             dz = float(2.0)/float(field.nz)
             zgrid = np.arange(field.nz)/float(field.nz-1)*(2.0-dz)-1.0
             zgrid_ext = np.arange(field.nz+4)/float(field.nz+4-1)*(2.0+3*dz)-(1.0+2.0*dz)
-            field.set_time(field.tfld[-1])
+            #field.set_time(field.tfld[-1])
+            field.set_time(field.tfld[-1],len(field.tfld)-1)
        
             imax = np.unravel_index(np.argmax(abs(field.phi()[:,0,:])),(field.nz,field.nx))
             imaxa = np.unravel_index(np.argmax(abs(field.apar()[:,0,:])),(field.nz,field.nx))
@@ -187,7 +194,8 @@ if 'x_local' in pars and not pars['x_local']:
                 gradphi[:,j] = fd_d1_o4(phi_bnd[:,j],zgrid_ext)
                 gradphi[2:-2,j] = gradphi[2:-2,j]/np.pi/(geometry['jacobian'][:,j]*geometry['Bfield'][:,j])
         
-            field.set_time(field.tfld[-1])
+            #field.set_time(field.tfld[-1])
+            field.set_time(field.tfld[-1],len(field.tfld)-1)
         
             #apar = field.apar()[:,:]
         
@@ -278,8 +286,10 @@ else:
             scan_info[i,0] = pars0['kymin']
             if 'x0' in pars0:
                 scan_info[i,1] = pars0['x0']
-            else:
+            elif 'x0' in pars:
                 scan_info[i,1] = pars['x0']
+            else:
+                scan_info[i,1] = np.nan
             if 'kx_center' in pars0:
                 scan_info[i,2] = pars0['kx_center']
             else:
@@ -293,7 +303,10 @@ else:
             pars0 = par0.pardict
             nspec = pars0['n_spec']
             scan_info[i,0] = float(str(pars0['kymin']).split()[0])
-            scan_info[i,1] = float(str(pars0['x0']).split()[0])
+            if 'x0' in pars0:
+                scan_info[i,1] = float(str(pars0['x0']).split()[0])
+            else:
+                scan_info[i,1] = np.nan
             if 'kx_center' in pars0:
                 scan_info[i,2] = float(str(pars0['kx_center']).split()[0])
             else:
@@ -301,7 +314,7 @@ else:
             if 'n0_global' in pars0:
                 scan_info[i,3] = pars0['n0_global']
             else:
-                scan_info[i,3] = 0.0
+                scan_info[i,3] = np.nan
         if os.path.isfile('omega_'+scan_num):
             omega0 = np.genfromtxt('omega_'+scan_num)
             if omega0.any() and omega0[1] != 0.0:
@@ -323,8 +336,8 @@ else:
             scan_info[i,5]=np.nan
         
         if os.path.isfile('field_'+scan_num):
-            field = fieldfile('field_'+scan_num,pars0)
-            field.set_time(field.tfld[-1])
+            field = fieldfile('field_'+scan_num,pars0,False)
+            field.set_time(field.tfld[-1],len(field.tfld)-1)
             fntot = field.nz*field.nx
     
             dz = float(2.0)/float(field.nz)
@@ -334,7 +347,13 @@ else:
             apar = np.zeros(fntot,dtype='complex128')
             phikx = field.phi()[:,0,:]
             aparkx = field.phi()[:,0,:]
-            phase_fac = -np.e**(-2.0*np.pi*(0.0+1.0J)*pars0['n0_global']*pars0['q0'])
+            if 'n0_global' in pars0:
+                phase_fac = -np.e**(-2.0*np.pi*(0.0+1.0J)*pars0['n0_global']*pars0['q0'])
+            else:
+                #print "pars0['shat']",pars0['shat']
+                #print "pars0['kymin']",pars0['kymin']
+                #print "pars0['lx']",pars0['lx']
+                phase_fac = -np.e**(-np.pi*(0.0+1.0J)* pars0['shat']*pars0['kymin']*pars0['lx'])
             for j in range(field.nx/2+1):
                 phi[(j+field.nx/2)*field.nz:(j+field.nx/2+1)*field.nz]=field.phi()[:,0,j]*phase_fac**j
                 if j < field.nx/2:
@@ -452,6 +471,6 @@ else:
     f.close()
 
 os.chdir('../')
-call(['./plot_scan_info_efit.py',suffix])
+call(['plot_scan_info_efit.py',suffix])
 
 
