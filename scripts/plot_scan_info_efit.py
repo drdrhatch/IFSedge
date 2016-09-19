@@ -121,9 +121,11 @@ def get_grids(data_in):
     for i in range(numscan_tot):
         if data[i,0] not in ky_array:
             ky_array = np.append(ky_array,data[i,0])
-        if data[i,1] not in x0_array:
+        if data[i,1] not in x0_array and not np.isnan(data[i,1]):
             x0_array = np.append(x0_array,data[i,1])
-
+ 
+    if len(x0_array) == 0:
+        x0_array = np.append(x0_array,0.0)
     nkxc = numscan_tot/(len(ky_array)*len(x0_array)) 
     kxc_array = np.empty((len(ky_array),nkxc))
     kxc_array[:,:] = -1.0
@@ -135,7 +137,7 @@ def get_grids(data_in):
             fill_index[kyind] += 1
             kxc_array[kyind,fill_index[kyind]] = data_in[i,2]
 
-    print 'fill_index',fill_index
+    #print 'fill_index',fill_index
     return ky_array, x0_array, kxc_array
 
 def get_kxc_array(data_in,ky_array,x0_array):
@@ -186,6 +188,7 @@ def get_ky_arrays(data_in):
 #        index_x0[index] += 1
 #        data_x0[index,index_x0[index],:] = data[i,:]
 #    return x0_array, data_x0 
+
 
 ky_array, x0_array, kxc_array = get_grids(data)
 data_ky = get_ky_arrays(data)
