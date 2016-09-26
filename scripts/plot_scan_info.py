@@ -475,7 +475,7 @@ else:
     f.close()
     plt.xlabel(r'$k_y \rho_s$',size=18)
     plt.title("Using pedestal averaged shear rate")
-    plt.ylabel(r'$\gamma  /  \gamma_{\theta_0} $',size=18)
+    plt.ylabel(r'$\gamma  /  \gamma_{min} $',size=18)
     plt.show()
 
     for i in range(len(data[:,0])):
@@ -502,7 +502,7 @@ else:
     f.close()
     plt.xlabel(r'$k_y \rho_s$',size=18)
     plt.title("Using local shear rate")
-    plt.ylabel(r'$\gamma  /  \gamma_{\theta_0} $',size=18)
+    plt.ylabel(r'$\gamma  /  \gamma_{min} $',size=18)
     plt.show()
 
 
