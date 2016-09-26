@@ -150,12 +150,14 @@ if 'x_local' in pars and not pars['x_local']:
             scan_info[i,5]=np.nan
         if os.path.isfile('field_'+scan_num):
             field = fieldfile('field_'+scan_num,pars0)
+            #field.set_time(field.tfld[-1],len(field.tfld[-1])-1)
             field.set_time(field.tfld[-1])
             fntot = field.nz*field.nx
     
             dz = float(2.0)/float(field.nz)
             zgrid = np.arange(field.nz)/float(field.nz-1)*(2.0-dz)-1.0
             zgrid_ext = np.arange(field.nz+4)/float(field.nz+4-1)*(2.0+3*dz)-(1.0+2.0*dz)
+            #field.set_time(field.tfld[-1],len(field.tfld[-1])-1)
             field.set_time(field.tfld[-1])
        
             imax = np.unravel_index(np.argmax(abs(field.phi()[:,0,:])),(field.nz,field.nx))
@@ -188,6 +190,7 @@ if 'x_local' in pars and not pars['x_local']:
                 gradphi[:,j] = fd_d1_o4(phi_bnd[:,j],zgrid_ext)
                 gradphi[2:-2,j] = gradphi[2:-2,j]/np.pi/(geometry['jacobian'][:,j]*geometry['Bfield'][:,j])
         
+            #field.set_time(field.tfld[-1],len(field.tfld[-1])-1)
             field.set_time(field.tfld[-1])
         
             #apar = field.apar()[:,:]
@@ -325,6 +328,7 @@ else:
         
         if os.path.isfile('field_'+scan_num):
             field = fieldfile('field_'+scan_num,pars0)
+            #field.set_time(field.tfld[-1],len(field.tfld)-1)
             field.set_time(field.tfld[-1])
             fntot = field.nz*field.nx
     
@@ -405,16 +409,16 @@ else:
             gamma_HB_avg = gamma_HB_sum / phi_sum
             scan_info[i,12] = gamma_HB_avg
             #gamma_HB_theta = abs(gamma_HB_norm_x0*prefactor_norm)
-            theta0 = (scan_info[i,2]/(pars0['shat']*pars0['kymin']*np.pi))
-            if theta0 > 1.0:
-                theta0 -= 2.0
-            ind_theta0 = np.argmin(abs(zgrid_pp-theta0)) 
-            print 'kx_center',scan_info[i,2]
-            print 'shat',pars0['shat']
-            print 'kymin',pars0['kymin']
-            print 'theta0',theta0
-            print 'ind_theta0',ind_theta0
- 	    scan_info[i,13] = gamma_HB_theta[ind_theta0]
+            #theta0 = (scan_info[i,2]/(pars0['shat']*pars0['kymin']*np.pi))
+            #if theta0 > 1.0:
+            #    theta0 -= 2.0
+            #ind_theta0 = np.argmin(abs(zgrid_pp-theta0)) 
+            #print 'kx_center',scan_info[i,2]
+            #print 'shat',pars0['shat']
+            #print 'kymin',pars0['kymin']
+            #print 'theta0',theta0
+            #print 'ind_theta0',ind_theta0
+ 	    scan_info[i,13] = np.min(gamma_HB_theta)
         else:
             scan_info[i,6] = np.nan
             scan_info[i,7] = np.nan
@@ -447,7 +451,7 @@ else:
     for line in lines:
         if 'scan' in line:
             f.write('#'+line+'\n')
-    f.write('#1.kymin 2.x0 3.kx_center 4.n0_global 5.gamma(cs/a) 6.omega(cs/a) 7.<z> 8.lambda_z 9.parity(apar) 10.parity(phi) 11.QEM/QES 12.Epar cancelation 13.gamma_HB_avg \n')
+    f.write('#1.kymin 2.x0 3.kx_center 4.n0_global 5.gamma(cs/a) 6.omega(cs/a) 7.<z> 8.lambda_z 9.parity(apar) 10.parity(phi) 11.QEM/QES 12.Epar cancelation 13.gamma_HB_avg 14.gamma_HB_min \n')
     np.savetxt(f,scan_info)
     f.close()
 
