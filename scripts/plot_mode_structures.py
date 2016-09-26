@@ -16,10 +16,13 @@ from interp import *
 #from calc_omega_from_field import *
 
 parser=op.OptionParser(description='Plots mode structures and calculates various interesting quantities.')
-parser.add_option('--plot_theta','-t',action='store_const',const=1,help = 'Plot all plots.',default='False')
+parser.add_option('--plot_theta','-g',action='store_const',const=1,help = 'Plot all plots.',default='False')
 parser.add_option('--plot_ballooning','-b',action='store_const',const=1,help = 'Plot all plots.',default='False')
 parser.add_option('--plot_all','-p',action='store_const',const=1,help = 'Plot all plots.',default='False')
+parser.add_option('--time','-t',type = 'float',action='store',dest="time0",help = 'Time to plot mode structure.',default=-1)
 options,args=parser.parse_args()
+print "options",options
+print "args",args
 if len(args)!=1:
     exit("""
 Please include run number as argument (e.g., 0001)."
@@ -28,6 +31,7 @@ suffix = args[0]
 plot_all=options.plot_all
 plot_ballooning=options.plot_ballooning
 plot_theta=options.plot_theta
+time0=float(options.time0)
 
 suffix = '_'+suffix
 
@@ -35,8 +39,22 @@ par = Parameters()
 par.Read_Pars('parameters'+suffix)
 pars = par.pardict
 
+#field = fieldfile('field'+suffix,pars,False)
 field = fieldfile('field'+suffix,pars)
-field.set_time(field.tfld[-1])
+#print "time0",time0
+#print "field.tfld",field.tfld
+time = np.array(field.tfld)
+if time0 == -1:
+    itime = -1
+    itime0 = len(time)-1
+else: 
+    itime = np.argmin(abs(time - time0))
+    itime0 = itime
+
+print "Looking at the mode structure at time:",time[itime]
+#field.set_time(time[itime],itime0)
+field.set_time(time[itime])
+
 ntot = field.nz*field.nx
 
 
@@ -281,7 +299,10 @@ else:  #x_local = False
         gradphi[:,0,i] = fd_d1_o4(phi_bnd[:,0,i],zgrid_ext)
         gradphi[2:-2:,0,i] = gradphi[2:-2,0,i]/np.pi/(geometry['jacobian'][:,i]*geometry['Bfield'][:,i])
 
-    field.set_time(field.tfld[-1])
+    #field.set_time(field.tfld[-1],len(field.tfld)-1)
+    field.set_time(field.tfld[itime])
+
+
     imax = np.unravel_index(np.argmax(abs(field.phi()[:,0,:])),(field.nz,field.nx))
     print "imax",imax
 
