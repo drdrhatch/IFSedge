@@ -68,6 +68,7 @@ nustar_e=16.0/3.0/pi**0.5*q0/trpeps**1.5*(R_major/Lref)*Z**2*coll
 print "coll",coll
 print "nustar_i",nustar_i
 print "nustar_e",nustar_e
+print "q0",q0
 
 
 
