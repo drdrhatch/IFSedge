@@ -8,13 +8,16 @@ import re
 #file_name='profiles_nshift0.02_t3.25.iterdb'
 #file_name='profiles_3.25.iterdb'
 #file_name = 'profiles_t3.035_nshift0.02.iterdb'
-file_name = 'AUG_30701.iterdb'
+file_name = 'JET2_hyb2_Ze25Ne_ds20.iterdb'
 #file_name='profiles_3.5.iterdb'
 #file_name='iterdb.NSTX_129016A03_460'
 #If you want to compare with gene profile files:
 gene_plots=1    #set to 0 for no gene plots
-gene_e = 'gene_profiles30701_e'
-gene_i = 'gene_profiles30701_i'
+gene_e = 'gene_profiles_e'
+gene_i = 'gene_profiles_i'
+plot_impurity = True
+if plot_impurity:
+    gene_imp = 'gene_profiles_imp'
 #gene_i='profiles_3.25i.gene'
 #gene_e='profiles_3.25e.gene'
 #gene_i='profiles_nshift0.02_t3.25i.gene'
@@ -25,6 +28,8 @@ gene_i = 'gene_profiles30701_i'
 if gene_plots:
     gprof_i=np.genfromtxt(gene_i)
     gprof_e=np.genfromtxt(gene_e)
+    if plot_impurity:
+        gprof_imp=np.genfromtxt(gene_imp)
 
 f=open(file_name,'r')
 data_in=f.read()
@@ -114,6 +119,11 @@ def plot_next(data_linesplit,lnum,num):
     if gene_plots and quantity=='NM1':
         plt.plot(rhot,arr/1.0e19,label=quantity+'('+units+')')
         plt.plot(gprof_i[:,0],gprof_i[:,3],'r.',label='$n_i$ gene')
+        plt.legend(loc='lower left')
+        plt.show()
+    if gene_plots and quantity=='NM2' and plot_impurity:
+        plt.plot(rhot,arr/1.0e19,label=quantity+'('+units+')')
+        plt.plot(gprof_imp[:,0],gprof_imp[:,3],'r.',label='$n_i$ gene')
         plt.legend(loc='lower left')
         plt.show()
     if gene_plots and quantity=='TE':
