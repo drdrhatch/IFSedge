@@ -4,11 +4,11 @@ from finite_differences import *
 from interp import *
 
 ####### Modify ######
-base_name = 'JET2_n56_3a_Ts32'
+base_name = 'JET2_hyb2_scdITER_Ze61Ar'
 base_num = ''
 file_in_name = 'rbsProfs'
 show_plots = False
-include_impurity = False
+include_impurity = True
 ####### Modify ######
 
 if include_impurity:
