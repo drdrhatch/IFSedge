@@ -28,20 +28,26 @@ def full_interp(func_xin,xin,xconv,yconv,yout,verify_interp = False):
     """
 
     #If necessary truncate func_xin onto correct range
-    if xin[0] < xconv[0]:
-        low_index = np.argmin(abs(xconv-xin[0]))
-    else:
-        low_index = 0
-    if xin[-1] > xconv[-1]:
-        high_index = np.argmin(abs(xconv-xin[-1]))
-    else:
-        high_index = -1
+    #if xin[0] < xconv[0]:
+    #    low_index = np.argmin(abs(xconv-xin[0]))
+    #else:
+    #    low_index = 0
+    #if xin[-1] > xconv[-1]:
+    #    high_index = np.argmin(abs(xconv-xin[-1]))
+    #else:
+    #    high_index = -1
+#
+#    if high_index == -1:
+#        func_xin = func_xin[low_index:]
+#        xin = xin[low_index:]
+#    else:
+#        func_xin = func_xin[low_index:high_index]
+#        xin = xin[low_index:high_index]
 
-    if high_index == -1:
-        func_xin = func_xin[low_index:]
-    else:
-        func_xin = func_xin[low_index:high_index]
-
+    #print len(xin),len(func_xin),len(xconv)
+    #plt.plot(xin)
+    #plt.plot(xconv)
+    #plt.show()
     func_xconv = interp(xin,func_xin,xconv)
     func_yout = interp(yconv,func_xconv,yout)
     xout = interp(yconv,xconv,yout) 
