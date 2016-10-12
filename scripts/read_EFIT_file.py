@@ -123,9 +123,9 @@ def calc_rho_tor(psip_n, psiax, psisep, qpsi, nw,psip_n_max=0.999):
     ##################
     qnew = q_spl_psi(psi_pol_fine)
     psip_n_fine = (psi_pol_fine-psiax)/(psisep-psiax)
-    plt.plot(psip_n_fine,qnew)
-    plt.plot(psip_n,qpsi,'x-')
-    plt.show()
+    #plt.plot(psip_n_fine,qnew)
+    #plt.plot(psip_n,qpsi,'x-')
+    #plt.show()
     ##################
     ##################
     for i in range(1,nw*10):
@@ -133,13 +133,14 @@ def calc_rho_tor(psip_n, psiax, psisep, qpsi, nw,psip_n_max=0.999):
         y=q_spl_psi(x)
         psi_tor_fine[i]=np.trapz(y,x)
 
+    phi_edge = psi_tor_fine[-1]
     rhot_n_fine=np.sqrt(psi_tor_fine/(psi_tor_fine[-1]-psi_tor_fine[0]))
     rho_tor_spl=US(psi_pol_fine, rhot_n_fine, k=interpol_order, s=1e-5)
     # rhot_n grid (not uniform, on even grid of psi_pol) of resolution=nw 
     rhot_n=rho_tor_spl(psi_pol)
     
     # rho_tor_spl takes value of psi_pol (not normalized) and convert into rhot_n
-    return rho_tor_spl, rhot_n
+    return rho_tor_spl, rhot_n, phi_edge
 
 def calc_B_fields(Rgrid, rmag, Zgrid, zmag, psirz, psiax, psisep, F, nw, psip_n):
     
@@ -212,3 +213,31 @@ def read_EFIT_parameters(efit_file_name):
     if psisep2!=psisep: sys.exit('Inconsistent psisep: %7.4g, %7.4g' %(psisep,psisep2))
 
     return rdim,zdim,rctr,rmin,zmid,Bctr,curr,nh
+
+def get_dimpar_pars(efit_file_name,rhot0):
+
+    psip_n, Rgrid, Zgrid, F, p, ffprime, pprime, psirz, qpsi, rmag, zmag, nw,psiax,psisep = read_EFIT_file(efit_file_name)
+    #plt.plot(Rgrid)
+    #plt.title('Rgrid (rmag = '+str(rmag)+')')
+    #plt.show()
+    R_major = rmag
+    dummy, rhot_n, phi_edge = calc_rho_tor(psip_n, psiax, psisep, qpsi, nw,psip_n_max=0.999)
+    psip_n_obmp, R_obmp, B_pol, B_tor = calc_B_fields(Rgrid, rmag, Zgrid, zmag, psirz, psiax, psisep, F, nw, psip_n)
+    Bref = abs(B_tor[0])
+    Lref = np.sqrt(2.0*abs(phi_edge/Bref))
+    #plt.plot(rhot_n,psip_n)
+    #plt.xlabel('rhot_n')
+    #plt.ylabel('psi_n')
+    #plt.show()
+    irhot_n = np.argmin(abs(rhot_n-rhot0))
+    q0 = qpsi[irhot_n]
+    return Lref, Bref, R_major, q0
+
+def get_current_density(efit_file_name):
+
+    psip_n, Rgrid, Zgrid, F, p, ffprime, pprime, psirz, qpsi, rmag, zmag, nw,psiax,psisep = read_EFIT_file(efit_file_name)
+    Jtot = Rgrid*pprime+ffprime/Rgrid
+    return psip_n,Rgrid,Jtot
+
+
+
