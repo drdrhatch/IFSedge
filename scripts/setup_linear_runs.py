@@ -11,26 +11,19 @@ setup_global = False
 x0_scan = False
 setup_lilo = False
 
+
 ######Modify
 #case = 'gene_ITER_n56_3a'
-case = 'JET2_1'
-#efit_file_name = 'g_new_901_1244_1415'
-#efit_file_name = 'g_new_901_1185_1415'
-#efit_file_name = 'GITER_N56_3A.00000_INV_TEQ'
+case = 'JET_hybQ1_Ze28Ne_ds20'
+include_impurity = True
 efit_file_name = 'g_new_901_901_1415'
-#efit_file_name = 'g_new_601_601_944'
-#efit_file_name = 'g_new_901_1585_1415'
 #x0_values=[0.974,0.98,0.986,0.992]
-x0_values=[ 0.94, 0.96, 0.97, 0.98, 0.99 ]
+x0_values=[0.97, 0.98 ]
 #x0_values=[0.86,0.9,0.94,0.98]
 #x0_values=[0.86, 0.9, 0.94, 0.98]
 #x0_values=[0.8, 0.85, 0.9, 0.95]
-#ky_scan_string = '0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6'
-#ky_scan_string = '0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.7, 1.0'
-#ky_scan_string = '0.05, 0.1, 0.2, 0.3, 0.4, 0.7, 1.0'
-ky_scan_string = '0.1, 0.2'
+ky_scan_string = '0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0'
 edge_opt = 2.0
-#ky_scan_string = '1.0, 5.0, 10.0, 20.0, 40.0, 60.0, 100.0, 140.0'
 template_prob_dir_loc  = 'prob_template_local'
 template_prob_dir_glob = 'prob_template_global'
 submit_runs = False
@@ -42,7 +35,7 @@ batch_script_job_prefix = '#SBATCH -J '
 submit_command = 'sbatch'
 ExB_glob = -1111.0   #'scan' for both 0.0 and -1111.0
 ### For kx_center scan
-num_kxcenter = 7
+num_kxcenter = 5
 gene_dirname = 'gene_feb16/'
 ######Modify
 
@@ -101,17 +94,28 @@ if x0_scan:
         call(['rm','-r',probdirloc])
     call(['cp','-r',template_prob_dir_loc,probdirloc])
     call(['cp','-r',homedir+'/scripts/setup_linear_runs.py',probdirloc])
+    if include_impurity:
+       print "Warning: include_impurity not ready for x0_scan!"
+       stop
 
 if setup_global:
     if os.path.exists(probdirglob):
         call(['rm','-r',probdirglob])
     call(['cp','-r',template_prob_dir_glob,probdirglob])
     call(['cp','-r',homedir+'/scripts/setup_linear_runs.py',probdirglob])
+    if include_impurity:
+       print "Warning: include_impurity not ready for global!"
+       stop
+
+
 if setup_lilo:
     if os.path.exists(probdirlilo):
         call(['rm','-r',probdirlilo])
     call(['cp','-r',template_prob_dir_glob,probdirlilo])
     call(['cp','-r',homedir+'/scripts/setup_linear_runs.py',probdirlilo])
+    if include_impurity:
+       print "Warning: include_impurity not ready for LILO!"
+       stop
 
 if kx_center_scan:
     for dir in probdirkxc:
@@ -284,9 +288,9 @@ if setup_lilo:
 
 ##### kx_center_scan #####
 if kx_center_scan:
-    call(['ln','-s',homedir+'scripts/scan_info.py',diagdir])
-    call(['ln','-s',homedir+'scripts/plot_scan_info.py',diagdir])
-    call(['ln','-s',homedir+'scripts/plot_contour_x0_ky.py',diagdir])
+    call(['ln','-s',homedir+'gscripts/scripts/scan_info.py',diagdir])
+    call(['ln','-s',homedir+'gscripts/scripts/plot_scan_info.py',diagdir])
+    call(['ln','-s',homedir+'gscripts/scripts/plot_contour_x0_ky.py',diagdir])
     for j in range(len(x0_values)):
         os.chdir(probdirkxc[j])
         call(['ln','-s',eqs_dir+efit_file_name])
@@ -328,6 +332,7 @@ if kx_center_scan:
         parfile=f.read()
         f.close()
         parfile_split = parfile.split('\n')
+        spec_ind = []
         for i in range(len(parfile_split)):
             if 'diagdir' in parfile_split[i]:
                 parfile_split[i] = 'diagdir = \''+diagdir+'\''
@@ -343,6 +348,32 @@ if kx_center_scan:
                 parfile_split[i] = 'iterdb_file = ' + '\''+ case+'.iterdb' + '\''
             if 'kx_center' in parfile_split[i]: 
                 parfile_split[i] = 'kx_center = 0.0  ' + kx_center_scan_string
+            if include_impurity and 'n_spec' in parfile_split[i]:
+                parfile_split[i] = 'n_spec = 3 ' 
+            if 'species' in parfile_split[i]:
+                spec_ind.append(i)
+            if include_impurity and 'n_procs_s' in parfile_split[i]:
+                parfile_split[i] = 'n_procs_s = 1 ' 
+            if include_impurity and 'n_procs_z' in parfile_split[i]:
+                parfile_split[i] = 'n_procs_z = 8 ' 
+             
+        if include_impurity:
+            imp_charge = raw_input('Enter impurity charge:\n')
+            imp_mass = raw_input('Enter impurity mass:\n')
+            imp_label = raw_input('Enter impurity label:\n')
+        #print 'spec_ind',spec_ind
+            parfile_split.insert(spec_ind[1],'\n')
+            parfile_split.insert(spec_ind[1],'/')
+            parfile_split.insert(spec_ind[1],'prof_type = -2')
+            parfile_split.insert(spec_ind[1],'temp = -1')
+            parfile_split.insert(spec_ind[1],'dens = -1')
+            parfile_split.insert(spec_ind[1],'omn = -1')
+            parfile_split.insert(spec_ind[1],'omt = -1')
+            parfile_split.insert(spec_ind[1],'charge = '+str(imp_charge))
+            parfile_split.insert(spec_ind[1],'mass = '+str(imp_mass))
+            parfile_split.insert(spec_ind[1],'name = '+'\''+imp_label+'\'')
+            parfile_split.insert(spec_ind[1],'&species')
+
         parfile_out='\n'.join(parfile_split)
         f=open('parameters','w')
         f.write(parfile_out)
