@@ -8,14 +8,14 @@ import re
 #file_name='profiles_nshift0.02_t3.25.iterdb'
 #file_name='profiles_3.25.iterdb'
 #file_name = 'profiles_t3.035_nshift0.02.iterdb'
-file_name = 'JET2_hyb2_Ze25Ne_ds20.iterdb'
+file_name = 'AUG_B21_vrotfactor0.3682.iterdb'
 #file_name='profiles_3.5.iterdb'
 #file_name='iterdb.NSTX_129016A03_460'
 #If you want to compare with gene profile files:
 gene_plots=1    #set to 0 for no gene plots
 gene_e = 'gene_profiles_e'
 gene_i = 'gene_profiles_i'
-plot_impurity = True
+plot_impurity = False
 if plot_impurity:
     gene_imp = 'gene_profiles_imp'
 #gene_i='profiles_3.25i.gene'
