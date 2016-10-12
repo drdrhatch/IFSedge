@@ -68,6 +68,8 @@ irout = np.argmin(abs(rho_tor-rout))
 gam_avg_norm = np.sum(abs(gamma_ExB_norm[irin:irout]))/(irout-irin)
 gam_avg_raw = np.sum(abs(gamma_ExB[irin:irout]))/(irout-irin)
 
+print "Minor radius a:", a
+print "Sound speed cs at "+str(rt0)+": ",cs[i0]
 print "GENE ExB shear rate at "+str(rt0)+": "+str(gamma_ExB_norm[i0])
 print "GENE ExB shear average from "+str(rin)+" to "+ str(rout) +": "+str(gam_avg_norm)
 print "GENE ExB shear average (normalized to box center) from "+str(rin)+" to "+ str(rout) +": "+str(gam_avg_raw*a/cs[i0])
