@@ -25,11 +25,11 @@ par = Parameters()
 par.Read_Pars('parameters'+suffix)
 pars = par.pardict
 if pars['n_spec'] == 1:
-    time, nrgi = get_nrg0(suffix)
+    time, nrgi = get_nrg0(suffix,nspec=1)
 elif pars['n_spec'] == 2:
-    time, nrgi, nrge = get_nrg0(suffix)
+    time, nrgi, nrge = get_nrg0(suffix,nspec=2)
 elif pars['n_spec'] == 3:
-    time, nrgi, nrge, nrg2 = get_nrg0(suffix)
+    time, nrgi, nrge, nrg2 = get_nrg0(suffix,nspec=3)
 else:
     sys.exit("n_spec must be 1,2,3.")
 
