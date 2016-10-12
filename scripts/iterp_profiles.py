@@ -4,7 +4,7 @@ from finite_differences import *
 from interp import *
 
 ####### Modify ######
-base_name = 'JET2_hyb2_scdITER_Ze61Ar'
+base_name = 'JET_hybQ1_Ze37Ne_ds20'
 base_num = ''
 file_in_name = 'rbsProfs'
 show_plots = False
