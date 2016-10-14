@@ -17,12 +17,13 @@ def calc_gr2(suffix,nspec=2,ncols=10):
         time,nrgi,nrg2,nrge=get_nrg0(suffix,nspec=nspec,ncols=ncols)
         #sys.exit("Must have n_spec=2")
     else:
-        sys.exit("Must have n_spec=2")
+        time,nrgi = get_nrg0(suffix,nspec=nspec,ncols=ncols)
 
     #print  "1. nrgi[-1,0]/nrgi[-2,0]",nrgi[-1,0]/nrgi[-2,0]
     if nrgi[-1,0]/nrgi[-2,0] < 1.0e-10:
         nrgi=np.delete(nrgi,-1,0)
-        nrge=np.delete(nrge,-1,0)
+        if nspec > 1:
+            nrge=np.delete(nrge,-1,0)
         time=np.delete(time,-1,0)
 
     start_time=time[-1]-2.0
@@ -45,12 +46,13 @@ def calc_gr2(suffix,nspec=2,ncols=10):
         avg_gr[i]=np.sum(dlogdt[:-1,i])/len(dlogdt[:-1,i])
 
     for i in range(ntime-1):
-        i0=i+start_index
-        dlogdt[i,0]=0.5*(nrge[i0+1,0]-nrge[i0,0])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,0]+nrge[i0,0]))
-        dlogdt[i,1]=0.5*(nrge[i0+1,2]-nrge[i0,2])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,2]+nrge[i0,2]))
-        dlogdt[i,2]=0.5*(nrge[i0+1,3]-nrge[i0,3])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,3]+nrge[i0,3]))
-        dlogdt[i,3]=0.5*(nrge[i0+1,6]-nrge[i0,6])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,6]+nrge[i0,6]))
-        dlogdt[i,4]=0.5*(nrge[i0+1,7]-nrge[i0,7])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,7]+nrge[i0,7]))
+        if nspec > 1:
+            i0=i+start_index
+            dlogdt[i,0]=0.5*(nrge[i0+1,0]-nrge[i0,0])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,0]+nrge[i0,0]))
+            dlogdt[i,1]=0.5*(nrge[i0+1,2]-nrge[i0,2])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,2]+nrge[i0,2]))
+            dlogdt[i,2]=0.5*(nrge[i0+1,3]-nrge[i0,3])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,3]+nrge[i0,3]))
+            dlogdt[i,3]=0.5*(nrge[i0+1,6]-nrge[i0,6])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,6]+nrge[i0,6]))
+            dlogdt[i,4]=0.5*(nrge[i0+1,7]-nrge[i0,7])/(time[i0+1]-time[i0])/(0.5*(nrge[i0+1,7]+nrge[i0,7]))
 
     for i in range(5,10):
         avg_gr[i]=np.sum(dlogdt[:-1,i-5])/len(dlogdt[:-1,i-5])
