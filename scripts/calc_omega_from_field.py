@@ -51,17 +51,20 @@ print "iend,end_time",iend,field.tfld[iend]
 #field.set_time(field.tfld[-1],len(field.tfld)-1)
 field.set_time(field.tfld[-1])
 imax = np.unravel_index(np.argmax(abs(field.phi()[:,0,:])),(field.nz,field.nx))
-imaxa = np.unravel_index(np.argmax(abs(field.apar()[:,0,:])),(field.nz,field.nx))
+phi = np.empty(0,dtype='complex128')
+if pars['n_fields'] > 1:
+    imaxa = np.unravel_index(np.argmax(abs(field.apar()[:,0,:])),(field.nz,field.nx))
+    apar = np.empty(0,dtype='complex128')
+
 print "imax",imax
 
-phi = np.empty(0,dtype='complex128')
-apar = np.empty(0,dtype='complex128')
 time = np.empty(0)
 for i in range(istart,iend):
     #field.set_time(field.tfld[i],i)
     field.set_time(field.tfld[i])
     phi = np.append(phi,field.phi()[imax[0],0,imax[1]])
-    apar = np.append(apar,field.apar()[imaxa[0],0,imaxa[1]])
+    if pars['n_fields'] > 1:
+        apar = np.append(apar,field.apar()[imaxa[0],0,imaxa[1]])
     time = np.append(time,field.tfld[i])
      
 #plt.semilogy(time,np.abs(phi))
@@ -74,6 +77,8 @@ if len(phi) < 2.0:
 else:
     output_zeros = False
     if calc_from_apar:
+        if pars['n_fields'] < 2:
+            stop
         omega = np.log(apar/np.roll(apar,1))
         dt = time - np.roll(time,1)
         omega /= dt
