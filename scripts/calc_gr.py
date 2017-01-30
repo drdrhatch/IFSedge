@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sys import path
 from sys import exit
-script_path='/afs/ipp/home/d/davidhat/scripts/'
-path.append(script_path)
 from get_nrg import *
 import os
 from finite_differences import *
