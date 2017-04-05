@@ -265,7 +265,10 @@ else:  #x_local = False
     zgrid_ext = np.arange(field.nz+4)/float(field.nz+4-1)*(2.0+3*dz)-(1.0+2.0*dz)
     #print zgrid
     #print zgrid_ext
-    xgrid = np.arange(field.nx)/float(field.nx-1)*pars['lx_a']+pars['x0']-pars['lx_a']/2.0
+    if 'lx_a' in pars:
+        xgrid = np.arange(field.nx)/float(field.nx-1)*pars['lx_a']+pars['x0']-pars['lx_a']/2.0
+    else:
+        xgrid = np.arange(field.nx)/float(field.nx-1)*pars['lx'] - pars['lx']/2.0
     gpars,geometry = read_geometry_global(pars['magn_geometry'][1:-1]+suffix)
 
     #Find rational q surfaces

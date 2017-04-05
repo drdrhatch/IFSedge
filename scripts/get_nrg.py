@@ -3,15 +3,14 @@ import numpy as np
 def get_nrg0(suffix,nspec=2,ncols=10):
     #if nspec < 1 or nspec > 2:
     #    stop
-    
 
     time=np.empty(0,dtype='float')
-    nrgi=np.empty((0,10),dtype='float')
+    nrg1=np.empty((0,10),dtype='float')
 
     if nspec<=2:
-        nrge=np.empty((0,10),dtype='float')
+        nrg2=np.empty((0,10),dtype='float')
     if nspec<=3:
-        nrge=np.empty((0,10),dtype='float')
+        nrg2=np.empty((0,10),dtype='float')
         nrg3=np.empty((0,10),dtype='float')
     if nspec>=4:
         print "nspec=",nspec
@@ -32,12 +31,12 @@ def get_nrg0(suffix,nspec=2,ncols=10):
             nline=nrg_in_lines[j].split()
             for i in range(ncols):
                 nrg0[0,i]=nline[i]
-            nrgi=np.append(nrgi,nrg0,axis=0)
+            nrg1=np.append(nrg1,nrg0,axis=0)
         elif nspec>=2 and nrg_in_lines[j] and j % (nspec+1) ==2:
             nline=nrg_in_lines[j].split()
             for i in range(ncols):
                 nrg0[0,i]=nline[i]
-            nrge=np.append(nrge,nrg0,axis=0)
+            nrg2=np.append(nrg2,nrg0,axis=0)
         elif nspec==3 and nrg_in_lines[j] and j % (nspec+1) ==3:
             nline=nrg_in_lines[j].split()
             for i in range(ncols):
@@ -47,11 +46,11 @@ def get_nrg0(suffix,nspec=2,ncols=10):
 
 
     if nspec==1:
-        return time,nrgi
+        return time,nrg1
     elif nspec==2:
-        return time,nrgi,nrge
+        return time,nrg1,nrg2
     else:
-        return time,nrgi,nrge,nrg3
+        return time,nrg1,nrg2,nrg3
 
 
 
