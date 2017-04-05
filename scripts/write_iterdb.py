@@ -13,7 +13,12 @@ def iterdb_header(quant_str,units,quant_len,shot_num):
     header=header+'   0                          ;-NUMBER OF ASSOCIATED SCALAR QUANTITIES\n'
     header=header+' RHOTOR              -        ;-INDEPENDENT VARIABLE LABEL: X-\n'
     header=header+' TIME                SECONDS  ;-INDEPENDENT VARIABLE LABEL: Y-\n'
-    header=header+' '+quant_str+'                    '+units+'        ;-DEPENDENT VARIABLE LABEL\n'
+    spaces = '                '
+    if(len(quant_str)==3):
+        spaces += ' '
+    elif(len(quant_str)==2):
+        spaces += '  '
+    header=header+' '+quant_str+spaces+units+'           ;-DEPENDENT VARIABLE LABEL\n'
     header=header+' 3                            ;-PROC CODE- 0:RAW 1:AVG 2:SM. 3:AVG+SM\n'
     header=header+'      '+str(quant_len)+'                   ;-# OF X PTS- \n'
     header=header+'      1                   ;-# OF Y PTS-  X,Y,F(X,Y) DATA FOLLOW:\n'
@@ -41,28 +46,28 @@ def output_iterdb(rhot,rhop,ne,te,ni,ti,file_base,shot_num,time_string,vrot=np.a
     header=';----END-OF-ORIGINAL-HEADER------COMMENTS:-----------\n'
     idbf.write(header)
 
-    header=iterdb_header('TE','ev',len(rhot),shot_num)
+    header=iterdb_header('TE','eV',len(rhot),shot_num)
     idbf.write(header)
     iterdb_write_quant(idbf,rhot)
     idbf.write('  '+time_string+'\n')      
     iterdb_write_quant(idbf,1000.0*te)
     idbf.write(transition)
 
-    header=iterdb_header('TI','ev',len(rhot),shot_num)
+    header=iterdb_header('TI','eV',len(rhot),shot_num)
     idbf.write(header)
     iterdb_write_quant(idbf,rhot)
     idbf.write('  '+time_string+'\n')      
     iterdb_write_quant(idbf,1000.0*ti)
     idbf.write(transition)
 
-    header=iterdb_header('NE','m-3',len(rhot),shot_num)
+    header=iterdb_header('NE','m^-3',len(rhot),shot_num)
     idbf.write(header)
     iterdb_write_quant(idbf,rhot)
     idbf.write('  '+time_string+'\n')      
     iterdb_write_quant(idbf,1.0e19*ne)
     idbf.write(transition)
 
-    header=iterdb_header('NM1','m-3',len(rhot),shot_num)
+    header=iterdb_header('NM1','m^-3',len(rhot),shot_num)
     idbf.write(header)
     iterdb_write_quant(idbf,rhot)
     idbf.write('  '+time_string+'\n')      
@@ -71,7 +76,7 @@ def output_iterdb(rhot,rhop,ne,te,ni,ti,file_base,shot_num,time_string,vrot=np.a
 
     #Include impurity density
     if nimp.any():
-        header=iterdb_header('NM2','m-3',len(rhot),shot_num)
+        header=iterdb_header('NM2','m^-3',len(rhot),shot_num)
         idbf.write(header)
         iterdb_write_quant(idbf,rhot)
         idbf.write('  '+time_string+'\n')      
