@@ -7,15 +7,16 @@ import matplotlib.pyplot as plt
 from scipy import interpolate
 
 def iterdb_header(quant_str,units,quant_len,shot_num):
-    header=' '+shot_num+' 2 0 6             ;-SHOT #- F(X) DATA -gyro2iterdb-\n'
+    #header=' '+shot_num+'              ;-SHOT #- F(X) DATA \n'
+    header=' 99999  xyz 2              ;-SHOT #- F(X) DATA \n'
     header=header+'                              ;-SHOT DATE-  UFILES ASCII FILE SYSTEM\n'
     header=header+'   0                          ;-NUMBER OF ASSOCIATED SCALAR QUANTITIES\n'
     header=header+' RHOTOR              -        ;-INDEPENDENT VARIABLE LABEL: X-\n'
     header=header+' TIME                SECONDS  ;-INDEPENDENT VARIABLE LABEL: Y-\n'
-    header=header+' '+quant_str+'              '+units+'        ;-DEPENDENT VARIABLE LABEL\n'
+    header=header+' '+quant_str+'                    '+units+'        ;-DEPENDENT VARIABLE LABEL\n'
     header=header+' 3                            ;-PROC CODE- 0:RAW 1:AVG 2:SM. 3:AVG+SM\n'
-    header=header+'         '+str(quant_len)+'                   ;-# OF X PTS- \n'
-    header=header+'          1                   ;-# OF Y PTS-  X,Y,F(X,Y) DATA FOLLOW:\n'
+    header=header+'      '+str(quant_len)+'                   ;-# OF X PTS- \n'
+    header=header+'      1                   ;-# OF Y PTS-  X,Y,F(X,Y) DATA FOLLOW:\n'
     return header 
 
 def iterdb_write_quant(fileid,quant_arr):
