@@ -30,7 +30,7 @@ def iterdb_write_quant(fileid,quant_arr):
     for i in range(len(quant_arr)):
         out_str='%-12e' % quant_arr[i]
         #if quant_arr[i] > 0.0:
-        if quant_arr[i]:
+        if quant_arr[i] >= 0.0:
             out_str=' '+out_str
         fileid.write(out_str)
         if (i+1)%6==0 and i != len(quant_arr)-1:
