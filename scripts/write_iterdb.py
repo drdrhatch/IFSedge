@@ -22,13 +22,15 @@ def iterdb_header(quant_str,units,quant_len,shot_num):
     header=header+' 3                            ;-PROC CODE- 0:RAW 1:AVG 2:SM. 3:AVG+SM\n'
     header=header+'      '+str(quant_len)+'                   ;-# OF X PTS- \n'
     header=header+'      1                   ;-# OF Y PTS-  X,Y,F(X,Y) DATA FOLLOW:\n'
+    header+=' '
     return header 
 
 def iterdb_write_quant(fileid,quant_arr):
-    fileid.write('  ')
+    fileid.write(' ')
     for i in range(len(quant_arr)):
         out_str='%-12e' % quant_arr[i]
-        if quant_arr[i] > 0.0:
+        #if quant_arr[i] > 0.0:
+        if quant_arr[i]:
             out_str=' '+out_str
         fileid.write(out_str)
         if (i+1)%6==0 and i != len(quant_arr)-1:
@@ -41,7 +43,7 @@ def output_iterdb(rhot,rhop,ne,te,ni,ti,file_base,shot_num,time_string,vrot=np.a
     transition=transition+'********************************************************************************\n'
     transition=transition+'********************************************************************************\n'
     idbf=open(file_base+'.iterdb','w')
-    header=';Created with script profiles_pol2tor.py for GENE input\n' 
+    header=';Created with script write_iterdb.py for GENE input\n' 
     idbf.write(header)
     header=';----END-OF-ORIGINAL-HEADER------COMMENTS:-----------\n'
     idbf.write(header)
