@@ -22,7 +22,7 @@ def iterdb_header(quant_str,units,quant_len,shot_num):
     header=header+' 3                            ;-PROC CODE- 0:RAW 1:AVG 2:SM. 3:AVG+SM\n'
     header=header+'      '+str(quant_len)+'                   ;-# OF X PTS- \n'
     header=header+'      1                   ;-# OF Y PTS-  X,Y,F(X,Y) DATA FOLLOW:\n'
-    header+=' '
+    #header+=' '
     return header 
 
 def iterdb_write_quant(fileid,quant_arr):
