@@ -28,6 +28,10 @@ def iterdb_header(quant_str,units,quant_len,shot_num):
 def iterdb_write_quant(fileid,quant_arr):
     fileid.write(' ')
     for i in range(len(quant_arr)):
+        if quant_arr[i] == 0.0:
+            #print "0(1)",quant_arr[i]
+            quant_arr[i] = quant_arr[i]**2 # needed for -0.0 
+            #print "0(2)",quant_arr[i]
         out_str='%-12e' % quant_arr[i]
         #if quant_arr[i] > 0.0:
         if quant_arr[i] >= 0.0:
