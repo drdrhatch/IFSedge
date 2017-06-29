@@ -206,7 +206,7 @@ def read_EFIT_parameters(efit_file_name):
 
     rmag,zmag,psiax,psisep,Bctr=[float(eqdsk[2][j*entrylength:(j+1)*entrylength]) for j in range(len(eqdsk[2])/entrylength)]
     curr,psiax2,dum,rmag2,dum=[float(eqdsk[3][j*entrylength:(j+1)*entrylength]) for j in range(len(eqdsk[3])/entrylength)]
-    zmag2,dum,psisep2,dum,dum=[float(eqdsk[4][j*entrylength:(j+1)*entrylength]) for j in range(len(eqdsk[4])/entrylength)]
+    zmag2,dum,psisep2,dum,dum=[float(eqdsk[4][j*entrylength:(j+1)*entrylength]) for j in range(len(eqdsk[4])/entrylength)] 
     if rmag!=rmag2: sys.exit('Inconsistent rmag: %7.4g, %7.4g' %(rmag,rmag2))
     if psiax2!=psiax: sys.exit('Inconsistent psiax: %7.4g, %7.4g' %(psiax,psiax2))
     if zmag!=zmag2: sys.exit('Inconsistent zmag: %7.4g, %7.4g' %(zmag,zmag2) )
@@ -238,6 +238,26 @@ def get_current_density(efit_file_name):
     psip_n, Rgrid, Zgrid, F, p, ffprime, pprime, psirz, qpsi, rmag, zmag, nw,psiax,psisep = read_EFIT_file(efit_file_name)
     Jtot = Rgrid*pprime+ffprime/Rgrid
     return psip_n,Rgrid,Jtot
+
+
+def get_geom_pars(efit_file_name,rhot0):
+
+    psip_n, Rgrid, Zgrid, F, p, ffprime, pprime, psirz, qpsi, rmag, zmag, nw,psiax,psisep = read_EFIT_file(efit_file_name)
+    R_major = rmag
+    dummy, rhot_n, phi_edge = calc_rho_tor(psip_n, psiax, psisep, qpsi, nw,psip_n_max=0.999)
+    psip_n_obmp, R_obmp, B_pol, B_tor = calc_B_fields(Rgrid, rmag, Zgrid, zmag, psirz, psiax, psisep, F, nw, psip_n)
+    Bref = abs(B_tor[0])
+    Lref = np.sqrt(2.0*abs(phi_edge/Bref))
+    irhot_n = np.argmin(abs(rhot_n-rhot0))
+    q0 = qpsi[irhot_n]
+
+
+    rhot_new = np.linspace(rhot_n[0],rhot_n[-1],4.0*len(rhot_n))
+    qpsi_new = interp(rhot_n,qpsi,rhot_new)  
+    shat = rhot_new/qpsi_new*fd_d1_o4(qpsi_new,rhot_new)
+    irhot_new = np.argmin(abs(rhot_new-rhot0))
+    shat0 = shat[irhot_new]
+    return Lref, Bref, R_major, q0, shat0
 
 
 
