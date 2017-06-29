@@ -187,7 +187,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 3 == 0:
             f.write('\n')
 
-    f.write('\n')
+    if len(geometry['q']) % 3 != 0:
+        f.write('\n')
 
     #geometry['gxx'] = np.empty(0)
     temp = np.reshape(geometry['gxx'],nx0*nz0)
@@ -196,6 +197,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         f.write("%20.12E"% temp[i])
         if (i+1) % 16 == 0:
             f.write('\n')
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     #geometry['gxy'] = np.empty(0)
     temp = np.reshape(geometry['gxy'],nx0*nz0)
     f.write('gxy\n')
@@ -204,6 +207,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['gxz'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['gxz'],nx0*nz0)
     f.write('gxz\n')
     for i in range(len(temp)):
@@ -211,12 +216,16 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['gyy'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['gyy'],nx0*nz0)
     f.write('gyy\n')
     for i in range(len(temp)):
         f.write("%20.12E"% temp[i])
         if (i+1) % 16 == 0:
             f.write('\n')
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     #geometry['gyz'] = np.empty(0)
     temp = np.reshape(geometry['gyz'],nx0*nz0)
     f.write('gyz\n')
@@ -225,6 +234,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['gzz'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['gzz'],nx0*nz0)
     f.write('gzz\n')
     for i in range(len(temp)):
@@ -232,6 +243,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['Bfield'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['Bfield'],nx0*nz0)
     f.write('Bfield\n')
     for i in range(len(temp)):
@@ -239,6 +252,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['dBdx'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['dBdx'],nx0*nz0)
     f.write('dBdx\n')
     for i in range(len(temp)):
@@ -246,6 +261,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['dBdy'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['dBdy'],nx0*nz0)
     f.write('dBdy\n')
     for i in range(len(temp)):
@@ -253,6 +270,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['dBdz'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['dBdz'],nx0*nz0)
     f.write('dBdz\n')
     for i in range(len(temp)):
@@ -260,6 +279,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['jacobian'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['jacobian'],nx0*nz0)
     f.write('jacobian\n')
     for i in range(len(temp)):
@@ -267,6 +288,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['C_y'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     f.write('C_y\n')
     for i in range(len(geometry['C_y'])):
         f.write("%20.12E"% geometry['C_y'][i])
@@ -274,7 +297,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
             f.write('\n')
     #geometry['C_xy'] = np.empty(0)
 
-    f.write('\n')
+    if len(geometry['C_y']) % 3 != 0:
+        f.write('\n')
 
     f.write('C_xy\n')
     for i in range(len(geometry['C_xy'])):
@@ -282,7 +306,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 3 == 0:
             f.write('\n')
 
-    f.write('\n')
+    if len(geometry['C_xy']) % 3 != 0:
+        f.write('\n')
 
     #geometry['geo_R'] = np.empty(0)
     temp = np.reshape(geometry['geo_R'],nx0*nz0)
@@ -292,6 +317,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['geo_Z'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['geo_Z'],nx0*nz0)
     f.write('geo_Z\n')
     for i in range(len(temp)):
@@ -299,6 +326,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['geo_c1'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['geo_c1'],nx0*nz0)
     f.write('geo_c1\n')
     for i in range(len(temp)):
@@ -306,6 +335,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['geo_c2'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     temp = np.reshape(geometry['geo_c2'],nx0*nz0)
     f.write('geo_c2\n')
     for i in range(len(temp)):
@@ -313,6 +344,8 @@ def write_tracer_efit_file(parameters,geometry,file_name):
         if (i+1) % 16 == 0:
             f.write('\n')
     #geometry['dpdx_pm_arr'] = np.empty(0)
+    if nx0*nz0 % 16 != 0:
+        f.write('\n')
     f.write('dpdx_pm_arr\n')
     for i in range(len(geometry['dpdx_pm_arr'])):
         f.write("%20.12E"% geometry['dpdx_pm_arr'][i])
