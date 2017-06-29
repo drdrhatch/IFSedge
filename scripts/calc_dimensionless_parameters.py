@@ -53,17 +53,22 @@ cref_gene = 9787.1518*np.sqrt((Te*1000.0)/2.0)
 OmrefSI = ee*Bref/mref 
 rhostar = crefSI/OmrefSI/Lref
 rhostar_gene = 3.2255E-3 * np.sqrt((2.0)*Te)/Bref/(minor_r*Lref)
-print "rhostar = ",rhostar
-#print "rhostar_gene = ",rhostar_gene
-
-
 coll = 2.3031E-5*Lref*(ne)/(Te)**2*(24.0-log(sqrt(ne*1.0E13)/Te*0.001))
-
-
 
 nustar_i=8.0/3.0/pi**0.5*q0/trpeps**1.5*(R_major/Lref)*(ni/ne)*Z**4/(Te/Ti)**2*coll
 
 nustar_e=16.0/3.0/pi**0.5*q0/trpeps**1.5*(R_major/Lref)*Z**2*coll
+
+print "Sound speed (m/s):", crefSI
+print "Sound gyroradius (m):", crefSI/OmrefSI
+print "Transit frequency (1/s):", crefSI/Lref
+
+print "*************************"
+print "Dimensionless parameters:"
+print "*************************"
+print "rhostar = ",rhostar
+#print "rhostar_gene = ",rhostar_gene
+
 
 print "coll",coll
 print "nustar_i",nustar_i
