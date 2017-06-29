@@ -17,9 +17,9 @@ from read_iterdb import *
 #from calc_omega_from_field import *
 
 parser=op.OptionParser(description='Plots mode structures and calculates various interesting quantities.')
-parser.add_option('--plot_theta','-g',action='store_const',const=1,help = 'Plot all plots.',default='False')
-parser.add_option('--plot_ballooning','-b',action='store_const',const=1,help = 'Plot all plots.',default='False')
-parser.add_option('--plot_all','-a',action='store_const',const=1,help = 'Plot all plots.',default='False')
+parser.add_option('--plot_theta','-g',action='store_const',const=False,help = 'Plot all plots.',default=True)
+parser.add_option('--plot_ballooning','-b',action='store_const',const=False,help = 'Plot all plots.',default=True)
+parser.add_option('--plot_all','-a',action='store_const',const=1,help = 'Plot all plots.',default=False)
 parser.add_option('--time','-t',type = 'float',action='store',dest="time0",help = 'Time to plot mode structure.',default=-1)
 parser.add_option('--idb','-i',type = 'str',action='store',dest="idb_file",help = 'ITERDB file name.',default='empty')
 parser.add_option('--pfile','-f',type = 'str',action='store',dest="prof_file",help = 'ITERDB file name.',default='empty')
@@ -32,6 +32,7 @@ Please include run number as argument (e.g., 0001)."
     \n""")
 suffix = args[0]
 plot_all=options.plot_all
+print "options.plot_ballooning", options.plot_ballooning
 plot_ballooning=options.plot_ballooning
 plot_theta=options.plot_theta
 idb_file = options.idb_file
@@ -108,15 +109,15 @@ def my_corr_func_complex(v1,v2,time,show_plot=False,v1eqv2=True):
     return cfunc,tau,corr_time
 
 dz = float(2*field.nx)/ntot
-print 'dz',dz
+#print 'dz',dz
 dz = float(2.0)/float(field.nz)
-print 'dz',dz
+#print 'dz',dz
 zgrid = np.arange(ntot)/float(ntot-1)*(2*field.nx-dz)-field.nx
 #print 'zgrid',zgrid
 
 phi = np.zeros(ntot,dtype='complex128')
 apar = np.zeros(ntot,dtype='complex128')
-print "ntot",field.nz*field.nx
+#print "ntot",field.nz*field.nx
 
 if 'x_local' in pars:
     if pars['x_local']:
@@ -132,7 +133,7 @@ if x_local:
         phase_fac = -np.e**(-2.0*np.pi*(0.0+1.0J)*pars['n0_global']*pars['q0'])
     else:
         phase_fac = -1.0
-    print "phase_fac",phase_fac
+    #print "phase_fac",phase_fac
 
     if pars['shat'] < 0.0:
         for i in range(field.nx/2+1):
@@ -152,8 +153,6 @@ if x_local:
                 apar[(i+field.nx/2)*field.nz:(i+field.nx/2+1)*field.nz]=field.apar()[:,0,i]*phase_fac**i
                 if i < field.nx/2:
                     apar[(field.nx/2-i-1)*field.nz : (field.nx/2-i)*field.nz ]=field.apar()[:,0,-1-i]*phase_fac**(-(i+1))
-
-
     
     zavg=np.sum(np.abs(phi)*np.abs(zgrid))/np.sum(np.abs(phi))
     print "zavg (for phi)",zavg
@@ -224,7 +223,7 @@ if x_local:
     #plt.show()
     
     #Note:  the complex frequency is (gamma + i*omega)
-    print "Here"
+    #print "Here"
     gpars,geometry = read_geometry_local(pars['magn_geometry'][1:-1]+suffix)
     jacxB = geometry['gjacobian']*geometry['gBfield']
     #plt.plot(geometry['gjacobian']*geometry['gBfield'])
@@ -312,7 +311,7 @@ else:  #x_local = False
 
 
     imax = np.unravel_index(np.argmax(abs(field.phi()[:,0,:])),(field.nz,field.nx))
-    print "imax",imax
+    #print "imax",imax
 
     if plot_ballooning:
         plt.figure(figsize=(8.0,9.5))
@@ -347,7 +346,7 @@ else:  #x_local = False
     #Extract m's
     #phi_theta = np.zeros((field.nz+4,field.ny,field.nx),dtype = 'complex128')     
     for i in range(len(xgrid)):
-        print "m",pars['n0_global']*geometry['q'][i]
+        #print "m",pars['n0_global']*geometry['q'][i]
         #phi_theta[:,0,i] = interp(zgrid_ext,phi_bnd[:,0,i]*np.e**(-1J*pars['n0_global']*geometry['q'][i]*np.pi*zgrid_ext),zgridm)
         phi_theta[:,0,i] = interp(zgrid_ext,phi_bnd[:,0,i],zgridm)
         phi_theta[:,0,i] = phi_theta[:,0,i]*np.e**(1J*pars['n0_global']*geometry['q'][i]*np.pi*zgridm)
@@ -437,7 +436,7 @@ else:  #x_local = False
     #Extract m's
     #phi_theta = np.zeros((field.nz+4,field.ny,field.nx),dtype = 'complex128')     
     for i in range(len(xgrid)):
-        print "m",pars['n0_global']*geometry['q'][i]
+        #print "m",pars['n0_global']*geometry['q'][i]
         #phi_theta[:,0,i] = interp(zgrid_ext,phi_bnd[:,0,i]*np.e**(-1J*pars['n0_global']*geometry['q'][i]*np.pi*zgrid_ext),zgridm)
         apar_theta[:,i] = interp(zgrid,apar[:,i],zgridm)
         apar_theta[:,i] = apar_theta[:,i]*np.e**(1J*pars['n0_global']*geometry['q'][i]*np.pi*zgridm)
@@ -627,7 +626,7 @@ else:  #x_local = False
     #    plt.legend()
     #    plt.show()
 
-    if 'ExBrate' in pars and pars['ExBrate'] == -1111: 
+    if 'ExBrate' in pars and pars['ExBrate'] == -1111 and plot_ballooning: 
         plt.figure(figsize=(8.0,9.5))
         fig=plt.gcf()
         fig.subplots_adjust(right=0.9)
@@ -690,6 +689,4 @@ else:  #x_local = False
         plt.contourf(xgrid,zgrid,np.imag(gradphi[2:-2,0,:]+apar_cont_2D[:,0,:]),70,vmin = np.min(np.imag(gradphi[2:-2,0,:])),vmax = np.max(np.imag(gradphi[2:-2,0,:])))
         plt.colorbar()
         plt.show()
-    
-    
     
