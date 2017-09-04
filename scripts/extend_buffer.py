@@ -13,6 +13,8 @@ from read_EFIT_file import *
 
 parser=op.OptionParser(description='Extends profiles and geometry past separatrix.  Arguments: iterdb_file_name, geometry_file_name, parameters_file, efit_file_name.')
 parser.add_option('--xbound','-x',type = 'float',action='store',dest="xbound",help = 'Rho_tor at which to begin smoothing (default: maximum rho_tor of previous simulation).',default=-1)
+parser.add_option('--impurity','-i',action='store_const',const=1,help = 'Include impurity',default = False)
+parser.add_option('--qtreatment','-q',action='store_const',const=1,help = '0: constant q, 1: constant gradient smoothed to 0',default = 1)
 options,args=parser.parse_args()
 if len(args)!=4:
     exit("""
@@ -24,11 +26,16 @@ geom_file = args[1]
 parameters_file = args[2]
 efit_file = args[3]
 xbound = options.xbound
+impurity = options.impurity
+qtreatment = options.qtreatment
 
 geompars, geom = read_geometry_global(geom_file)
 print "np.shape(geom['gzz'])",np.shape(geom['gzz'])
 
-rhot_te, te, ti, ne, ni, nb, vrot = read_iterdb_file(iterdb_file)
+if impurity:
+    rhot_te, te, ti, ne, ni, nb, vrot = read_iterdb_file(iterdb_file)
+else:
+    rhot_te, te, ti, ne, ni, vrot = read_iterdb_file(iterdb_file)
 
 print "len(rhot_te)",len(rhot_te)
 #for i in range(len(rhot_te)):
@@ -53,7 +60,7 @@ drhotor = pars['lx_a']/(pars['nx0']-1)
 lx_extend = drhotor*extra_nx0
 erhotor_max = rhotor_max+lx_extend
 elx_a = erhotor_max - rhotor_min
-enx0 = pars['nx0']+extra_nx0
+enx0 = int(pars['nx0']+extra_nx0)
 print "New simulation range: rho_tor = [" + str(rhotor_min) + "," + str(rhotor_max+lx_extend) +"]"
 print "New lx_a:", elx_a
 print "New nx0:", enx0
@@ -63,12 +70,17 @@ print "New x0:", ex0
 print "Starting profile smoothing at xbound = ",xbound
 
 
-rhot_te, te, ti, ne, ni, nb, vrot = read_iterdb_file(iterdb_file)
+if impurity:
+   rhot_te, te, ti, ne, ni, nb, vrot = read_iterdb_file(iterdb_file)
+else:
+   rhot_te, te, ti, ne, ni, vrot = read_iterdb_file(iterdb_file)
+
 te = te/1000.0
 ti = ti/1000.0
 ne = ne/1.0e19
 ni = ni/1.0e19
-nb = nb/1.0e19
+if impurity:
+   nb = nb/1.0e19
 
 erhot = np.linspace(rhotor_min,erhotor_max,enx0)
 #itemp = np.argmin(abs(erhot-ex0))
@@ -79,7 +91,8 @@ ete = interp(rhot_te,te,erhot)
 eti = interp(rhot_te,ti,erhot)
 ene = interp(rhot_te,ne,erhot)
 eni = interp(rhot_te,ni,erhot)
-enb = interp(rhot_te,nb,erhot)
+if impurity:
+   enb = interp(rhot_te,nb,erhot)
 evrot = interp(rhot_te,vrot,erhot)
 
 show_plots = False
@@ -96,9 +109,10 @@ if show_plots:
    plt.plot(rhot_te,ni)
    plt.plot(erhot,eni)
    plt.show()
-   plt.plot(rhot_te,nb)
-   plt.plot(erhot,enb)
-   plt.show()
+   if impurity:
+      plt.plot(rhot_te,nb)
+      plt.plot(erhot,enb)
+      plt.show()
    plt.plot(rhot_te,vrot)
    plt.plot(erhot,evrot)
    plt.show()
@@ -111,7 +125,8 @@ omte = -1.0/ete*fd_d1_o4(ete,erhot)
 omti = -1.0/eti*fd_d1_o4(eti,erhot)
 omne = -1.0/ene*fd_d1_o4(ene,erhot)
 omni = -1.0/eni*fd_d1_o4(eni,erhot)
-omnb = -1.0/enb*fd_d1_o4(enb,erhot)
+if impurity:
+   omnb = -1.0/enb*fd_d1_o4(enb,erhot)
 domega = -1.0*fd_d1_o4(evrot,erhot)
 
 for i in range(extra_nx0+1):
@@ -122,7 +137,8 @@ for i in range(extra_nx0+1):
    eti[ixbound+i] = eti[ixbound]*np.e**(-omti[ixbound]/lambdaT)*np.e**(omti[ixbound]/lambdaT*np.e**(-lambdaT*(erhot[ixbound+i]-erhot[ixbound])))
    ene[ixbound+i] = ene[ixbound]*np.e**(-omne[ixbound]/lambdaN)*np.e**(omne[ixbound]/lambdaN*np.e**(-lambdaN*(erhot[ixbound+i]-erhot[ixbound])))
    eni[ixbound+i] = eni[ixbound]*np.e**(-omni[ixbound]/lambdaN)*np.e**(omni[ixbound]/lambdaN*np.e**(-lambdaN*(erhot[ixbound+i]-erhot[ixbound])))
-   enb[ixbound+i] = enb[ixbound]*np.e**(-omnb[ixbound]/lambdaN)*np.e**(omnb[ixbound]/lambdaN*np.e**(-lambdaN*(erhot[ixbound+i]-erhot[ixbound])))
+   if impurity:
+      enb[ixbound+i] = enb[ixbound]*np.e**(-omnb[ixbound]/lambdaN)*np.e**(omnb[ixbound]/lambdaN*np.e**(-lambdaN*(erhot[ixbound+i]-erhot[ixbound])))
    evrot[ixbound+i] = domega[ixbound]/lambdaT*np.e**(-lambdaT*(erhot[ixbound+i]-erhot[ixbound])) + evrot[ixbound]-domega[ixbound]/lambdaT 
 
 plt.plot(rhot_te,te)
@@ -151,7 +167,10 @@ plt.axis((erhot[0],erhot[-1],0.0*min(evrot),1.1*max(evrot)))
 plt.show()
 
 file_base =  iterdb_file[:-7]+"_extended"+"_nx0_"+str(enx0)+"_x0_"+str(ex0)+"_lx_a_"+str(elx_a)
-output_iterdb(erhot,erhot,ene,ete,eni,eti,file_base,'0','999.9',vrot=evrot,nimp=enb)
+if impurity:
+   output_iterdb(erhot,erhot,ene,ete,eni,eti,file_base,'0','999.9',vrot=evrot,nimp=enb)
+else:
+   output_iterdb(erhot,erhot,ene,ete,eni,eti,file_base,'0','999.9',vrot=evrot)
 
 
 Lref, Bref, R_major, q0, shat0 = get_geom_pars(efit_file,ex0)
@@ -184,6 +203,7 @@ geom_dummy1D = np.empty((enx0))
 #print np.shape(geom_dummy)
 #print np.shape(geom['gxx'])
 #print "len(geom_dummy[:,0]",len(geom_dummy[:,0])
+geompars['gridpoints'] = int(geompars['gridpoints'])
 geom_new['gxx'] = np.empty((geompars['gridpoints'],enx0))
 geom_new['gxx'][:,0:pars['nx0']] = geom['gxx']
 for i in range(extra_nx0):
@@ -276,8 +296,17 @@ for i in range(extra_nx0):
 
 geom_new['q'] = np.empty((enx0))
 geom_new['q'][0:pars['nx0']] = geom['q']
-for i in range(extra_nx0):
-    geom_new['q'][pars['nx0']+i] = geom['q'][-1]
+if qtreatment == 0:
+    for i in range(extra_nx0):
+        geom_new['q'][pars['nx0']+i] = geom['q'][-1]
+elif qtreatment == 1:
+    qprime = geom['q'][-1]-geom['q'][-2]
+    for i in range(extra_nx0):
+        geom_new['q'][pars['nx0']+i] = geom_new['q'][pars['nx0']+i-1] + qprime*np.e**(-float(i)/float(extra_nx0)*3.0)
+
+plt.plot(geom_new['q'])
+plt.title('q')
+plt.show()
 
 print "Writing new geometry file."
 write_tracer_efit_file(geompars_new,geom_new,geom_file_out)
