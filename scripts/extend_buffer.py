@@ -118,6 +118,7 @@ if show_plots:
    plt.show()
 
 ixbound = np.argmin(abs(erhot-xbound))
+print 'ixbound =', ixbound
 lambdaT = 8.0/(erhotor_max-rhotor_max)
 lambdaN = 6.0/(erhotor_max-rhotor_max)
 print "lambdaT",lambdaT
@@ -129,7 +130,7 @@ if impurity:
    omnb = -1.0/enb*fd_d1_o4(enb,erhot)
 domega = -1.0*fd_d1_o4(evrot,erhot)
 
-for i in range(extra_nx0+1):
+for i in range(enx0 - ixbound):
    #print ete[ixbound-1]*np.e**(-omte[ixbound]/lambdaT*np.e**(-lambdaT*(erhot[ixbound+i]-xbound)))
    #print "erhot[ixbound+i],xbound",erhot[ixbound+i],xbound
    #print "np.e**(-lambdaT*(erhot[ixbound+i]-xbound))",np.e**(-lambdaT*(erhot[ixbound+i]-xbound))
