@@ -71,6 +71,25 @@ def fd_d1_o4_uneven(var,grid,mat=False,return_new_grid = False):
         dvar = np.zeros(len(grid))
         dvar[2:-2] = interp(grid0[2:-2],dvar0[2:-2],grid[2:-2])
         return -dvar 
+
+def fd_d1_o4_smoothend(var,grid,mat=False):
+    """Centered finite difference, first derivative, 4th order using extrapolation to get boundary points
+    var: quantity to be differentiated.
+    grid: grid for var 
+    mat: matrix for the finite-differencing operator. if mat=False then it is created"""
+
+    dx = grid[1]-grid[0]
+    grid0 = np.linspace(grid[0]-2*dx,grid[-1]+2*dx,len(grid)+4)
+    var0 = interp(grid,var,grid0)
+
+    if not mat:
+        mat=get_mat_fd_d1_o4(len(var0),grid0[1]-grid0[0])
+
+    dvar0=-np.dot(mat,var0)
+    dvar_out=dvar0[2:-2]
+
+    return -dvar_out 
+ 
     
 def invert_fd_d1_o4(var,grid,mat=False):
     """Invert cenntered finite difference, first derivative, 4th order.
