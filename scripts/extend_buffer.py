@@ -69,7 +69,6 @@ print "New x0:", ex0
 
 print "Starting profile smoothing at xbound = ",xbound
 
-
 if impurity:
    rhot_te, te, ti, ne, ni, nb, vrot = read_iterdb_file(iterdb_file)
 else:
@@ -260,10 +259,11 @@ geom_new['jacobian'][:,0:pars['nx0']] = geom['jacobian']
 for i in range(extra_nx0):
     geom_new['jacobian'][:,pars['nx0']+i] = geom['jacobian'][:,-1]
 
+C_y0 = ex0/q0
 geom_new['C_y'] = np.empty((enx0))
-geom_new['C_y'][0:pars['nx0']] = geom['C_y']
+geom_new['C_y'][0:pars['nx0']] = C_y0
 for i in range(extra_nx0):
-    geom_new['C_y'][pars['nx0']+i] = geom['C_y'][-1]
+    geom_new['C_y'][pars['nx0']+i] = C_y0
 
 geom_new['C_xy'] = np.empty((enx0))
 geom_new['C_xy'][0:pars['nx0']] = geom['C_xy']
